@@ -19,13 +19,15 @@
 usage()
 {
 cat << EOF
-usage: $0 hostname
+usage: $0 hostname [iface]
 
-This script will take a virsh-managed VM hostname and return the IP address.
+This script will take a virsh-managed VM hostname and return the IP address. In the case of using the network in the `bridge` mode,
+the arp table will not possibly contain any IP addresses, optionally use alternative method `arp-scan` on specified `iface`.
 EOF
 }
 
 HOSTNAME=$1
+IFACE=$2
 
 if [[ -z $HOSTNAME ]]; then
     echo "ERROR: Hostname is required"
@@ -34,4 +36,9 @@ if [[ -z $HOSTNAME ]]; then
 fi
 
 MAC=$(virsh -q domiflist $HOSTNAME | awk '{ print $5 }')
-arp -e | grep -i $MAC | awk '{ print $1 }'
+
+if [ -z ${IFACE}  ]; then
+  arp -e | grep -i $MAC | awk '{ print $1 }'
+else
+  arp-scan --interface ${IFACE} --localnet | grep -i $MAC | awk '{ print $1 }'
+fi
