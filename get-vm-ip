@@ -33,4 +33,5 @@ if [[ -z $HOSTNAME ]]; then
     exit 1
 fi
 
-virsh domifaddr --domain ${HOSTNAME} --source arp | tail -2 | head -1 | awk '{ print $4 }' | sed -E 's/\/[[:digit:]]+//'
+MAC=$(virsh -q domiflist $HOSTNAME | awk '{ print $5 }')
+arp -e | grep -i $MAC | awk '{ print $1 }'
