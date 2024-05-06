@@ -37,7 +37,7 @@ fi
 
 MAC=$(virsh -q domiflist $HOSTNAME | awk '{ print $5 }')
 
-if [ -z ${IFACE}  ]; then
+if [[ -z ${IFACE}  ]]; then
   arp -e | grep -i $MAC | awk '{ print $1 }'
 else
   arp-scan --interface ${IFACE} --localnet | grep -i $MAC | awk '{ print $1 }'
